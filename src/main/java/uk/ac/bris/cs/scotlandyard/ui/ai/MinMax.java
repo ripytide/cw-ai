@@ -18,15 +18,26 @@ public class MinMax implements MovePicker {
         Long currentTime = Instant.now().toEpochMilli();
         Long endTime = currentTime + timeoutPair.right().toMillis(timeoutPair.left());
 
-        Move bestMove;
-        Float bestScore = 0f;
-        for(Move move : board.getAvailableMoves()){
-            Float currentScore = miniMax(((Board.GameState)board).advance(move), endTime, scoringMethod, true, 1);
-            if(currentScore > bestScore){
-                bestMove = move;
-                bestScore = currentScore;
+        Integer currentDepth = 0;
+        Move stableBestMove = board.getAvailableMoves().asList().get(0);
+        boolean stillGotTime = true;
+        while (stillGotTime) {
+            Optional<Move> unstableBestMove = Optional.empty();
+            Float bestScore = 0f;
+            for (Move move : board.getAvailableMoves()) {
+                Optional<Float> currentScore = miniMax(((Board.GameState) board).advance(move), endTime, scoringMethod, true, 1);
+                if (currentScore.isEmpty()){
+                    stillGotTime = false;
+                } else if (currentScore.get() > bestScore) {
+                    unstableBestMove = Optional.of(move);
+                    bestScore = currentScore.get();
+                }
             }
+            stableBestMove = unstableBestMove.get();
+            currentDepth++;
         }
+
+        return stableBestMove;
     }
 
     private static Optional<Float> miniMax(@Nonnull Board.GameState gameState, Long endTime, Score scoringMethod, boolean maxing, Integer depth) {
