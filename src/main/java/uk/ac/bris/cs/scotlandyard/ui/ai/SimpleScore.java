@@ -8,14 +8,14 @@ import java.util.stream.Collectors;
 
 public class SimpleScore implements Score{
     @Override
-    public float score(Board.GameState gameState) {
-        ImmutableSet<Piece> winners = gameState.getWinner();
+    public Float score(Board board) {
+        ImmutableSet<Piece> winners = board.getWinner();
         if(winners.isEmpty()){
             return 0.5f;
         }else if(winners.stream().noneMatch(Piece::isMrX)){
             return 0f;
         }else{
-            return 1;
+            return 1f;
         }
     }
 }
