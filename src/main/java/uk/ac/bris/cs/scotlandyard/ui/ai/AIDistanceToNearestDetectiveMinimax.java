@@ -8,17 +8,17 @@ import uk.ac.bris.cs.scotlandyard.model.Move;
 import javax.annotation.Nonnull;
 import java.util.concurrent.TimeUnit;
 
-public class AISimpleScoreMinimax implements Ai {
+public class AIDistanceToNearestDetectiveMinimax implements Ai {
     @Nonnull
     @Override
     public String name() {
-        return "AISimpleScoreMinimax";
+        return "AIDistanceToNearestDetectiveMinimax";
     }
 
     @Nonnull
     @Override
     public Move pickMove(@Nonnull Board board, Pair<Long, TimeUnit> timeoutPair) {
-        Score score = new SimpleScore();
+        Score score = new DistanceToNearestDetective();
         MinMax minMax = new MinMax();
 
         return minMax.selectionAlgorithm(board, timeoutPair, score);
