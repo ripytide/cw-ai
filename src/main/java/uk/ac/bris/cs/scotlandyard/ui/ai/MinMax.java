@@ -16,12 +16,15 @@ public class MinMax implements MovePicker {
     @Override
     public Move selectionAlgorithm(@Nonnull Board board, Pair<Long, TimeUnit> timeoutPair, Score scoringMethod) {
         Long currentTime = Instant.now().toEpochMilli();
-        Long endTime = currentTime + timeoutPair.right().toMillis(timeoutPair.left()) - 1500L;
+        Long endTime = currentTime + timeoutPair.right().toMillis(timeoutPair.left()) - 500L;
+
+        //Move List for debug purposes
+        ArrayList<Pair<Pair<Move, Float>, Integer>> moveScoresDepths = new ArrayList<>();
 
         Integer currentDepth = 0;
         Move stableBestMove = board.getAvailableMoves().asList().get(0);
         boolean stillGotTime = true;
-        while (stillGotTime) {
+        //while (stillGotTime) {
             Optional<Move> unstableBestMove = Optional.empty();
             Float bestScore = 0f;
             for (Move move : board.getAvailableMoves()) {
@@ -32,12 +35,19 @@ public class MinMax implements MovePicker {
                     unstableBestMove = Optional.of(move);
                     bestScore = currentScore.get();
                 }
+
+                if (currentScore.isPresent()) {
+                    moveScoresDepths.add(new Pair<>(new Pair<>(move, currentScore.get()), currentDepth));
+                }
             }
+
             stableBestMove = unstableBestMove.get();
             currentDepth++;
-        }
+        //}
         //DEBUGGING
         System.out.println("DEPTH: "+currentDepth);
+        System.out.println("BESTMOVE: "+stableBestMove);
+        System.out.println("MOVEDEPTHSCORES:"+moveScoresDepths);
 
         return stableBestMove;
     }
