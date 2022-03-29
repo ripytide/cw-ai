@@ -23,7 +23,8 @@ public class DistanceToNearestDetective implements Score {
         ImmutableValueGraph<Integer, Float> immutableGraph = ImmutableValueGraph.copyOf(valueAs1Graph);
 
         List<Piece> detectives = board.getPlayers().stream().filter(Piece::isDetective).toList();
-        Integer moveNumber = board.getMrXTravelLog().size();
+        List<Integer> locations = board.getMrXTravelLog().stream().map(l -> l.location()).filter(o -> o.isPresent()).map(l -> l.get()).toList();
+        //CONTINUE HERE
         Integer mrXLocation = board.getMrXTravelLog().get(moveNumber - 1).location().get();
         List<Integer> detectiveLocations = detectives.stream().map(p -> board.getDetectiveLocation((Piece.Detective) p).get()).toList();
         List<Float> distancesToMrX = detectiveLocations.stream().map(d -> Dijkstra.dijkstra(immutableGraph, d, mrXLocation)).toList();
