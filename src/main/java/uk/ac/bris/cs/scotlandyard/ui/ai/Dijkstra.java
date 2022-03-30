@@ -12,6 +12,8 @@ import java.util.*;
 
 public class Dijkstra {
     public static Float dijkstra(ImmutableValueGraph<Integer, Float> graph, Integer source, Integer destination) {
+        if(source.equals(destination)) return 0f;
+
         HashMap<Integer, Float> visitedNodes = new HashMap<>();
         HashMap<Integer, Float> unvisitedNodes = new HashMap<>();
 

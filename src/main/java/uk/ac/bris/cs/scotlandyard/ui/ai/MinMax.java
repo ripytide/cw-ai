@@ -24,7 +24,7 @@ public class MinMax implements MovePicker {
         Integer currentDepth = 0;
         Move stableBestMove = gameState.getAvailableMoves().asList().get(0);
         boolean stillGotTime = true;
-        //while (stillGotTime) {
+        while (stillGotTime) {
             Optional<Move> unstableBestMove = Optional.empty();
             Float bestScore = 0f;
             for (Move move : gameState.getAvailableMoves()) {
@@ -43,7 +43,7 @@ public class MinMax implements MovePicker {
 
             stableBestMove = unstableBestMove.get();
             currentDepth++;
-        //}
+        }
         //DEBUGGING
         System.out.println("DEPTH: "+currentDepth);
         System.out.println("BESTMOVE: "+stableBestMove);
