@@ -197,7 +197,7 @@ public class CustomGameState {
         }
     }
 
-    private CustomGameState advanceDetective(Move move){
+    private CustomGameState advanceDetective(Move move) {
         // mutable copy of things
         List<Piece> newRemaining = new ArrayList<>(remaining);
         List<Player> newDetectives = new ArrayList<>(detectives);
@@ -231,7 +231,7 @@ public class CustomGameState {
         return new CustomGameState(setup, ImmutableSet.copyOf(newRemaining), ImmutableList.copyOf(log), newMrX, ImmutableList.copyOf(newDetectives));
     }
 
-    private CustomGameState advanceMrX(Move move){
+    private CustomGameState advanceMrX(Move move) {
         // mutable copy of things
         List<Piece> newRemaining = new ArrayList<>(remaining);
         List<LogEntry> newLog = new ArrayList<>(log);
@@ -253,7 +253,7 @@ public class CustomGameState {
     }
 
     //used in appending log entries
-    private Move.Visitor<List<LogEntry>> getAdditionalLogEntriesVisitorCreator(Integer moveNumber){
+    private Move.Visitor<List<LogEntry>> getAdditionalLogEntriesVisitorCreator(Integer moveNumber) {
         return new Move.Visitor<>() {
             @Override
             public List<LogEntry> visit(Move.SingleMove move) {
@@ -288,5 +288,40 @@ public class CustomGameState {
 
     private List<Piece> getDetectivePieces(ImmutableList<Player> detectives) {
         return detectives.stream().map(Player::piece).collect(Collectors.toList());
+    }
+
+    //adaption from Board to CustomGameState
+    public static CustomGameState build(Board board) {
+        ImmutableSet<Piece> pieces = board.getPlayers();
+        List<Piece> detectives = board.getPlayers().stream().filter(Piece::isDetective).toList();
+        List<Player> detectivePlayers = detectives.stream().map(p -> convertPieceToPlayer(p, board)).toList();
+
+        Piece mrXPiece = pieces.stream().filter(Piece::isMrX).findFirst().get();
+        Player mrXPlayer = convertPieceToPlayer(mrXPiece, board);
+
+        ImmutableSet<Piece> remaining = ImmutableSet.of(mrXPiece);
+        return new CustomGameState(board.getSetup(), remaining,
+                board.getMrXTravelLog(), mrXPlayer,
+                ImmutableList.copyOf(detectivePlayers));
+    }
+
+    private static Player convertPieceToPlayer(Piece piece, Board board) {
+        Integer location;
+        if (piece.isMrX()) {
+            location = board.getAvailableMoves().iterator().next().source();
+        } else {
+            location = board.getDetectiveLocation((Piece.Detective) piece).get();
+        }
+        return new Player(piece, convertTicketBoardToMap(board.getPlayerTickets(piece).get()), location);
+    }
+
+    private static ImmutableMap<ScotlandYard.Ticket, Integer> convertTicketBoardToMap(Board.TicketBoard ticketBoard) {
+        HashMap<ScotlandYard.Ticket, Integer> ticketMap = new HashMap<>();
+        ticketMap.put(ScotlandYard.Ticket.TAXI, ticketBoard.getCount(ScotlandYard.Ticket.TAXI));
+        ticketMap.put(ScotlandYard.Ticket.BUS, ticketBoard.getCount(ScotlandYard.Ticket.BUS));
+        ticketMap.put(ScotlandYard.Ticket.UNDERGROUND, ticketBoard.getCount(ScotlandYard.Ticket.UNDERGROUND));
+        ticketMap.put(ScotlandYard.Ticket.DOUBLE, ticketBoard.getCount(ScotlandYard.Ticket.DOUBLE));
+        ticketMap.put(ScotlandYard.Ticket.SECRET, ticketBoard.getCount(ScotlandYard.Ticket.SECRET));
+        return ImmutableMap.copyOf(ticketMap);
     }
 }
