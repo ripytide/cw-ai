@@ -12,8 +12,10 @@ import java.util.*;
 
 public class Dijkstra {
     public static Float dijkstra(ImmutableValueGraph<Integer, Float> graph, Integer source, Integer destination) {
-        HashMap<Integer, Pair<Integer, Float>> visitedNodes = new HashMap<>(source);
+        HashMap<Integer, Float> visitedNodes = new HashMap<>();
         HashMap<Integer, Float> unvisitedNodes = new HashMap<>();
+
+        visitedNodes.put(source, 0f);
 
         boolean found = false;
         Integer currentNode = source;
@@ -45,19 +47,26 @@ public class Dijkstra {
                 }
             }
             //visit node
-            visitedNodes.put(closestNode, new Pair<>(currentNode, minDistance));
+            visitedNodes.put(closestNode, minDistance);
             unvisitedNodes.remove(closestNode);
 
             currentNode = closestNode;
             currentNodeDist = minDistance;
 
 
+
             //checking if we've finished
-            if (currentNode == destination) {
+            if (currentNode.equals(destination)) {
                 found = true;
             } else if (unvisitedNodes.isEmpty()) {
                 throw new IllegalArgumentException("destination unreachable in Dijkstra's.");
             }
+
+            //debugging
+            //System.out.println("Target: " + destination);
+            //System.out.println("Source: " + source);
+            //System.out.println("Vistited nodes: " + visitedNodes);
+            //System.out.println("Unvisited nodes: " + unvisitedNodes);
         }
 
         return currentNodeDist;
