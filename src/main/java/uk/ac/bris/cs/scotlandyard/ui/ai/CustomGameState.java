@@ -13,8 +13,8 @@ public class CustomGameState {
     private final GameSetup setup;
     private final ImmutableSet<Piece> remaining;
     private final ImmutableList<LogEntry> log;
-    private final Player mrX;
-    private final ImmutableList<Player> detectives;
+    public final Player mrX;
+    public final ImmutableList<Player> detectives;
     private final ImmutableSet<Move> moves;
     private final ImmutableSet<Piece> winner;
 
@@ -77,11 +77,11 @@ public class CustomGameState {
         return advanceNoCheck(move);
     }
 
-    private boolean isDetectivesTurn() {
+    public boolean isDetectivesTurn() {
         return remaining.stream().noneMatch(Piece::isMrX);
     }
 
-    private boolean isMrXTurn() {
+    public boolean isMrXTurn() {
         return !isDetectivesTurn();
     }
 

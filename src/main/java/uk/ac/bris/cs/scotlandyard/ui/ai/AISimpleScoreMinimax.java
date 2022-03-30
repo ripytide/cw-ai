@@ -20,7 +20,8 @@ public class AISimpleScoreMinimax implements Ai {
     public Move pickMove(@Nonnull Board board, Pair<Long, TimeUnit> timeoutPair) {
         Score score = new SimpleScore();
         MinMax minMax = new MinMax();
+        CustomGameState gameState = CustomGameState.build(board);
 
-        return minMax.selectionAlgorithm(board, timeoutPair, score);
+        return minMax.selectionAlgorithm(gameState, timeoutPair, score);
     }
 }

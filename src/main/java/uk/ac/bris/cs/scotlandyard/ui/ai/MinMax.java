@@ -14,7 +14,7 @@ import java.util.stream.Collectors;
 
 public class MinMax implements MovePicker {
     @Override
-    public Move selectionAlgorithm(@Nonnull Board board, Pair<Long, TimeUnit> timeoutPair, Score scoringMethod) {
+    public Move selectionAlgorithm(@Nonnull CustomGameState gameState, Pair<Long, TimeUnit> timeoutPair, Score scoringMethod) {
         Long currentTime = Instant.now().toEpochMilli();
         Long endTime = currentTime + timeoutPair.right().toMillis(timeoutPair.left()) - 500L;
 
@@ -22,13 +22,13 @@ public class MinMax implements MovePicker {
         ArrayList<Pair<Pair<Move, Float>, Integer>> moveScoresDepths = new ArrayList<>();
 
         Integer currentDepth = 0;
-        Move stableBestMove = board.getAvailableMoves().asList().get(0);
+        Move stableBestMove = gameState.getAvailableMoves().asList().get(0);
         boolean stillGotTime = true;
         //while (stillGotTime) {
             Optional<Move> unstableBestMove = Optional.empty();
             Float bestScore = 0f;
-            for (Move move : board.getAvailableMoves()) {
-                Optional<Float> currentScore = miniMax(((Board.GameState) board).advance(move), endTime, scoringMethod, true, 1);
+            for (Move move : gameState.getAvailableMoves()) {
+                Optional<Float> currentScore = miniMax(((CustomGameState) gameState).advance(move), endTime, scoringMethod, true, 1);
                 if (currentScore.isEmpty()){
                     stillGotTime = false;
                 } else if (currentScore.get() > bestScore) {
@@ -52,15 +52,17 @@ public class MinMax implements MovePicker {
         return stableBestMove;
     }
 
-    private static Optional<Float> miniMax(@Nonnull Board.GameState gameState, Long endTime, Score scoringMethod, boolean maxing, Integer depth) {
+    private static Optional<Float> miniMax(@Nonnull CustomGameState gameState, Long endTime, Score scoringMethod, boolean maxing, Integer depth) {
         Long currentTime = Instant.now().toEpochMilli();
         if (currentTime < endTime) {
+            //recursion base case
             if (depth <= 0 || !gameState.getWinner().isEmpty()) {
                 return Optional.of(scoringMethod.score(gameState));
             }
             Float bestValue = maxing ? 0f : 1f;
             for (Move move : gameState.getAvailableMoves()) {
-                Optional<Float> value = miniMax(gameState.advance(move), endTime, scoringMethod, !maxing, depth--);
+                maxing = gameState.isMrXTurn();
+                Optional<Float> value = miniMax(gameState.advance(move), endTime, scoringMethod, maxing, depth--);
                 if (value.isEmpty()) {
                     return Optional.empty();
                 } else {
