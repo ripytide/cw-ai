@@ -19,9 +19,11 @@ public class AISimpleScoreMinimax implements Ai {
     @Override
     public Move pickMove(@Nonnull Board board, Pair<Long, TimeUnit> timeoutPair) {
         Score score = new SimpleScore();
-        MinMax minMax = new MinMax();
+        AccuracyBasedMetaScore minMax = new MinMax(score);
+        MovePicker timeBasedMovePicker = new TimeBasedMovePicker(minMax);
+
         CustomGameState gameState = CustomGameState.build(board);
 
-        return minMax.selectionAlgorithm(gameState, timeoutPair, score);
+        return timeBasedMovePicker.selectionAlgorithm(gameState, timeoutPair);
     }
 }

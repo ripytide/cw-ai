@@ -8,5 +8,5 @@ import javax.annotation.Nonnull;
 import java.util.concurrent.TimeUnit;
 
 public interface MovePicker {
-    public Move selectionAlgorithm(@Nonnull CustomGameState gameState, Pair<Long, TimeUnit> timeoutPair, Score scoringMethod);
+    public Move selectionAlgorithm(@Nonnull CustomGameState gameState, Pair<Long, TimeUnit> timeoutPair);
 }

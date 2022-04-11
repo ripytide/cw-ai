@@ -6,7 +6,13 @@ import java.time.Instant;
 import java.util.Optional;
 
 public class MinMax implements AccuracyBasedMetaScore {
-    public Optional<Float> score(@Nonnull CustomGameState gameState, Long endTime, Score scoringMethod, Integer depth) {
+    private final Score scoringMethod;
+
+    public MinMax(Score scoringMethod) {
+        this.scoringMethod = scoringMethod;
+    }
+
+    public Optional<Float> score(@Nonnull CustomGameState gameState, Long endTime, Integer depth) {
         boolean maxing = gameState.isMrXTurn();
         Long currentTime = Instant.now().toEpochMilli();
         if (currentTime < endTime) {
@@ -16,7 +22,7 @@ public class MinMax implements AccuracyBasedMetaScore {
             }
             Float bestValue = maxing ? 0f : 1f;
             for (Move move : gameState.getAvailableMoves()) {
-                Optional<Float> value = score(gameState.advance(move), endTime, scoringMethod, depth--);
+                Optional<Float> value = score(gameState.advance(move), endTime, depth--);
                 if (value.isEmpty()) {
                     return Optional.empty();
                 } else {

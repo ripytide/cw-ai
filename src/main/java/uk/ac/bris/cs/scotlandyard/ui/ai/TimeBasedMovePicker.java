@@ -10,8 +10,14 @@ import java.util.Optional;
 import java.util.concurrent.TimeUnit;
 
 public class TimeBasedMovePicker implements MovePicker{
+    private final AccuracyBasedMetaScore metaScore;
+    
+    public TimeBasedMovePicker(AccuracyBasedMetaScore metaScore){
+        this.metaScore = metaScore;
+    }
+    
     @Override
-    public Move selectionAlgorithm(@Nonnull CustomGameState gameState, Pair<Long, TimeUnit> timeoutPair, Score scoringMethod) {
+    public Move selectionAlgorithm(@Nonnull CustomGameState gameState, Pair<Long, TimeUnit> timeoutPair) {
         Long currentTime = Instant.now().toEpochMilli();
         Long endTime = currentTime + timeoutPair.right().toMillis(timeoutPair.left()) - 500L;
 
@@ -25,7 +31,7 @@ public class TimeBasedMovePicker implements MovePicker{
             Optional<Move> unstableBestMove = Optional.empty();
             Float bestScore = 0f;
             for (Move move : gameState.getAvailableMoves()) {
-                Optional<Float> currentScore = miniMax(((CustomGameState) gameState).advance(move), endTime, scoringMethod, true, currentDepth);
+                Optional<Float> currentScore = metaScore.score(gameState.advance(move), endTime, currentDepth);
                 if (currentScore.isEmpty()) {
                     //if we run out of time on a specific depth discard the current best move as
                     //it is better to take to complete best move of a prior depth
