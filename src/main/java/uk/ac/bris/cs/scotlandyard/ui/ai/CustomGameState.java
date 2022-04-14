@@ -3,7 +3,9 @@ package uk.ac.bris.cs.scotlandyard.ui.ai;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
+import com.google.common.graph.MutableValueGraph;
 import uk.ac.bris.cs.scotlandyard.model.*;
+import com.google.common.graph.*;
 
 import javax.annotation.Nonnull;
 import java.util.*;
@@ -323,5 +325,28 @@ public class CustomGameState {
         ticketMap.put(ScotlandYard.Ticket.DOUBLE, ticketBoard.getCount(ScotlandYard.Ticket.DOUBLE));
         ticketMap.put(ScotlandYard.Ticket.SECRET, ticketBoard.getCount(ScotlandYard.Ticket.SECRET));
         return ImmutableMap.copyOf(ticketMap);
+    }
+
+    public Float distanceBetweenLocations(Integer location1, Integer location2) {
+        MutableValueGraph<Integer, Float> valueAs1Graph = ValueGraphBuilder.undirected().build();
+        for (Integer node : setup.graph.nodes()) {
+            valueAs1Graph.addNode(node);
+        }
+
+        for (EndpointPair<Integer> edge : setup.graph.edges()) {
+            valueAs1Graph.putEdgeValue(edge.nodeU(), edge.nodeV(), 1f);
+        }
+
+        ImmutableValueGraph<Integer, Float> immutableGraph = ImmutableValueGraph.copyOf(valueAs1Graph);
+
+        return Dijkstra.dijkstra(immutableGraph, location1, location2);
+    }
+
+    public List<Float> getDistancesBetweenMrXAndDetectives() {
+        Integer mrXLocation = mrX.location();
+        List<Integer> detectiveLocations = detectives.stream().map(d -> d.location()).toList();
+        return detectiveLocations.stream()
+                .map(d -> distanceBetweenLocations(d, mrXLocation))
+                .toList();
     }
 }

@@ -8,7 +8,7 @@ import uk.ac.bris.cs.scotlandyard.model.Move;
 import javax.annotation.Nonnull;
 import java.util.concurrent.TimeUnit;
 
-public class AIDistanceToNearestDetectiveMinimax implements Ai {
+public class MrXAIDistanceToNearestDetectiveMinimax implements Ai {
     @Nonnull
     @Override
     public String name() {
