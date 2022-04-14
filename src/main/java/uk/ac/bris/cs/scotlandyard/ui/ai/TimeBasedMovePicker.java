@@ -1,6 +1,7 @@
 package uk.ac.bris.cs.scotlandyard.ui.ai;
 
 import io.atlassian.fugue.Pair;
+import uk.ac.bris.cs.scotlandyard.model.Board;
 import uk.ac.bris.cs.scotlandyard.model.Move;
 
 import javax.annotation.Nonnull;
@@ -17,7 +18,7 @@ public class TimeBasedMovePicker implements MovePicker{
     }
     
     @Override
-    public Move selectionAlgorithm(@Nonnull CustomGameState gameState, Pair<Long, TimeUnit> timeoutPair) {
+    public Move selectionAlgorithm(CustomGameState gameState, Board board, Pair<Long, TimeUnit> timeoutPair) {
         Long currentTime = Instant.now().toEpochMilli();
         Long endTime = currentTime + timeoutPair.right().toMillis(timeoutPair.left()) - 500L;
 
@@ -25,12 +26,12 @@ public class TimeBasedMovePicker implements MovePicker{
         ArrayList<Pair<Pair<Move, Float>, Integer>> moveScoresDepths = new ArrayList<>();
 
         Integer currentDepth = 0;
-        Move stableBestMove = gameState.getAvailableMoves().asList().get(0);
+        Move stableBestMove = board.getAvailableMoves().asList().get(0);
         boolean stillGotTime = true;
         while (stillGotTime) {
             Optional<Move> unstableBestMove = Optional.empty();
             Float bestScore = 0f;
-            for (Move move : gameState.getAvailableMoves()) {
+            for (Move move : board.getAvailableMoves()) {
                 Optional<Float> currentScore = metaScore.score(gameState.advance(move), endTime, currentDepth);
                 if (currentScore.isEmpty()) {
                     //if we run out of time on a specific depth discard the current best move as

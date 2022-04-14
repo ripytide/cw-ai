@@ -8,21 +8,21 @@ import uk.ac.bris.cs.scotlandyard.model.Move;
 import javax.annotation.Nonnull;
 import java.util.concurrent.TimeUnit;
 
-public class AISimpleScoreMinimax implements Ai {
+public class DetectiveAITotalDistanceToMrXMinimax implements Ai {
     @Nonnull
     @Override
     public String name() {
-        return "MrXAISimpleScoreMinimax";
+        return "DetectiveAITotalDistanceToMrXMinimax";
     }
 
     @Nonnull
     @Override
     public Move pickMove(@Nonnull Board board, Pair<Long, TimeUnit> timeoutPair) {
-        Score score = new SimpleScore();
+        Score score = new TotalDistanceToMrX();
         AccuracyBasedMetaScore minMax = new MinMax(score);
         MovePicker timeBasedMovePicker = new TimeBasedMovePicker(minMax);
 
-        CustomGameState gameState = CustomGameState.build(board, false);
+        CustomGameState gameState = CustomGameState.build(board, true);
 
         return timeBasedMovePicker.selectionAlgorithm(gameState, board, timeoutPair);
     }

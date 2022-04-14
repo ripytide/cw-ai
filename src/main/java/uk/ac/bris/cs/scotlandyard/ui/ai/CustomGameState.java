@@ -293,7 +293,7 @@ public class CustomGameState {
     }
 
     //adaption from Board to CustomGameState
-    public static CustomGameState build(Board board) {
+    public static CustomGameState build(Board board, boolean isDetectivesTurn) {
         ImmutableSet<Piece> pieces = board.getPlayers();
         List<Piece> detectives = board.getPlayers().stream().filter(Piece::isDetective).toList();
         List<Player> detectivePlayers = detectives.stream().map(p -> convertPieceToPlayer(p, board)).toList();
@@ -301,7 +301,7 @@ public class CustomGameState {
         Piece mrXPiece = pieces.stream().filter(Piece::isMrX).findFirst().get();
         Player mrXPlayer = convertPieceToPlayer(mrXPiece, board);
 
-        ImmutableSet<Piece> remaining = ImmutableSet.of(mrXPiece);
+        ImmutableSet<Piece> remaining = isDetectivesTurn ? ImmutableSet.copyOf(detectives) : ImmutableSet.of(mrXPiece);
         return new CustomGameState(board.getSetup(), remaining,
                 board.getMrXTravelLog(), mrXPlayer,
                 ImmutableList.copyOf(detectivePlayers));
@@ -310,7 +310,12 @@ public class CustomGameState {
     private static Player convertPieceToPlayer(Piece piece, Board board) {
         Integer location;
         if (piece.isMrX()) {
-            location = board.getAvailableMoves().iterator().next().source();
+            location = 114;
+            for (LogEntry l : board.getMrXTravelLog()){
+                if (l.location().isPresent()) {
+                    location = l.location().get();
+                }
+            }
         } else {
             location = board.getDetectiveLocation((Piece.Detective) piece).get();
         }

@@ -12,7 +12,7 @@ public class MrXAIDistanceToNearestDetectiveMinimax implements Ai {
     @Nonnull
     @Override
     public String name() {
-        return "AIDistanceToNearestDetectiveMinimax";
+        return "MrXAIDistanceToNearestDetectiveMinimax";
     }
 
     @Nonnull
@@ -22,8 +22,8 @@ public class MrXAIDistanceToNearestDetectiveMinimax implements Ai {
         AccuracyBasedMetaScore minMax = new MinMax(score);
         MovePicker timeBasedMovePicker = new TimeBasedMovePicker(minMax);
 
-        CustomGameState gameState = CustomGameState.build(board);
+        CustomGameState gameState = CustomGameState.build(board, false);
 
-        return timeBasedMovePicker.selectionAlgorithm(gameState, timeoutPair);
+        return timeBasedMovePicker.selectionAlgorithm(gameState, board, timeoutPair);
     }
 }
