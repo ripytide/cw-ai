@@ -48,25 +48,28 @@ public class Dijkstra {
                     minDistance = nodeDistance;
                 }
             }
+            //System.out.println("next node to visit: "+closestNode);
+
             //visit node
             visitedNodes.put(closestNode, minDistance);
-            unvisitedNodes.remove(closestNode);
-
-            currentNode = closestNode;
-            currentNodeDist = minDistance;
-
-
 
             //checking if we've finished
             if (currentNode.equals(destination)) {
                 found = true;
             } else if (unvisitedNodes.isEmpty()) {
                 throw new IllegalArgumentException("destination unreachable in Dijkstra's.");
+            }unvisitedNodes.remove(closestNode);
+
+            currentNode = closestNode;
+            currentNodeDist = minDistance;
+
+            if (visitedNodes.containsKey(destination) && !found){
+                System.out.println("Found destination");
             }
 
             //debugging
-            //System.out.println("Target: " + destination);
-            //System.out.println("Source: " + source);
+            System.out.println("Target: " + destination);
+            System.out.println("Source: " + source);
             //System.out.println("Vistited nodes: " + visitedNodes);
             //System.out.println("Unvisited nodes: " + unvisitedNodes);
         }

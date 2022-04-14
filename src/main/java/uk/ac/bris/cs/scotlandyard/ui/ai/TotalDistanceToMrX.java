@@ -1,10 +1,18 @@
 package uk.ac.bris.cs.scotlandyard.ui.ai;
 
-public class TotalDistanceToMrX implements Score{
+import java.util.List;
+
+public class TotalDistanceToMrX implements Score {
 
     @Override
     public Float score(CustomGameState gameState) {
-        //CONTINUE HERE
-        return null;
+        Integer mrXLocation = gameState.mrX.location();
+        List<Integer> detectiveLocations = gameState.detectives.stream().map(d -> d.location()).toList();
+        List<Float> distancesToMrX = detectiveLocations.stream()
+                .map(d -> GraphHelper.distanceBetweenLocations(gameState.getSetup().graph, d, mrXLocation))
+                .toList();
+
+        return distancesToMrX.stream().
+        return min;
     }
 }
