@@ -30,7 +30,7 @@ public class TimeBasedMovePicker implements MovePicker{
         boolean stillGotTime = true;
         while (stillGotTime) {
             Optional<Move> unstableBestMove = Optional.empty();
-            Float bestScore = 0f;
+            Float bestScore = gameState.isMrXTurn() ? Float.NEGATIVE_INFINITY : Float.POSITIVE_INFINITY;
             for (Move move : board.getAvailableMoves()) {
                 Optional<Float> currentScore = metaScore.score(gameState.advance(move), endTime, currentDepth);
                 if (currentScore.isEmpty()) {
@@ -38,7 +38,7 @@ public class TimeBasedMovePicker implements MovePicker{
                     //it is better to take to complete best move of a prior depth
                     unstableBestMove = Optional.empty();
                     stillGotTime = false;
-                } else if (currentScore.get() > bestScore) {
+                } else if (gameState.isMrXTurn() ? currentScore.get() > bestScore : currentScore.get() < bestScore) {
                     unstableBestMove = Optional.of(move);
                     bestScore = currentScore.get();
                 }
@@ -53,12 +53,21 @@ public class TimeBasedMovePicker implements MovePicker{
                 stableBestMove = unstableBestMove.get();
                 currentDepth++;
             }
-
         }
+
         //DEBUGGING
         System.out.println("DEPTH: " + currentDepth);
+
+        ArrayList<Pair<Pair<Move, Float>, Integer>> lastFullDepthMoveScoresDepths = moveScoresDepths;
+        for (Pair<Pair<Move, Float>, Integer> moveScoreDepth : moveScoresDepths) {
+            Move move = moveScoreDepth.left().left();
+            Float score = moveScoreDepth.left().right();
+            Integer depth = moveScoreDepth.right();
+            if (depth == currentDepth - 1){
+                System.out.println("Move: " + move + " Score: " + score);
+            }
+        }
         System.out.println("BESTMOVE: " + stableBestMove);
-        System.out.println("MOVEDEPTHSCORES:" + moveScoresDepths);
 
         return stableBestMove;
     }

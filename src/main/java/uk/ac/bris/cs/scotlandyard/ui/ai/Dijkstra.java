@@ -1,12 +1,6 @@
 package uk.ac.bris.cs.scotlandyard.ui.ai;
 
-import com.google.common.collect.ImmutableSet;
 import com.google.common.graph.ImmutableValueGraph;
-import javafx.util.Pair;
-import uk.ac.bris.cs.scotlandyard.model.Board;
-import uk.ac.bris.cs.scotlandyard.model.Move;
-import uk.ac.bris.cs.scotlandyard.model.Piece;
-import uk.ac.bris.cs.scotlandyard.model.ScotlandYard;
 
 import java.util.*;
 
@@ -48,7 +42,6 @@ public class Dijkstra {
                     minDistance = nodeDistance;
                 }
             }
-            //System.out.println("next node to visit: "+closestNode);
 
             //visit node
             visitedNodes.put(closestNode, minDistance);
@@ -62,16 +55,6 @@ public class Dijkstra {
 
             currentNode = closestNode;
             currentNodeDist = minDistance;
-
-            if (visitedNodes.containsKey(destination) && !found){
-                System.out.println("Found destination");
-            }
-
-            //debugging
-            System.out.println("Target: " + destination);
-            System.out.println("Source: " + source);
-            //System.out.println("Vistited nodes: " + visitedNodes);
-            //System.out.println("Unvisited nodes: " + unvisitedNodes);
         }
 
         return currentNodeDist;
