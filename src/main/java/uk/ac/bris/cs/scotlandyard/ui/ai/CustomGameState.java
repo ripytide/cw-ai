@@ -21,7 +21,7 @@ public class CustomGameState {
     private final ImmutableSet<Piece> winner;
 
 
-    private CustomGameState(@Nonnull final GameSetup setup, @Nonnull final ImmutableSet<Piece> remaining, @Nonnull final ImmutableList<LogEntry> log, @Nonnull final Player mrX, @Nonnull final ImmutableList<Player> detectives) {
+    public CustomGameState(@Nonnull final GameSetup setup, @Nonnull final ImmutableSet<Piece> remaining, @Nonnull final ImmutableList<LogEntry> log, @Nonnull final Player mrX, @Nonnull final ImmutableList<Player> detectives) {
         this.setup = setup;
         this.remaining = remaining;
         this.log = log;
