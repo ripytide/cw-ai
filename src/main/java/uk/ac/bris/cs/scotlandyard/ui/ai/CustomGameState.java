@@ -11,7 +11,7 @@ import javax.annotation.Nonnull;
 import java.util.*;
 import java.util.stream.Collectors;
 
-public class CustomGameState {
+public class CustomGameState implements Board {
     private final GameSetup setup;
     private final ImmutableSet<Piece> remaining;
     private final ImmutableList<LogEntry> log;
