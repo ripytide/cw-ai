@@ -13,7 +13,7 @@ import uk.ac.bris.cs.scotlandyard.model.Move;
 
 public class RandomAi implements Ai {
 
-	@Nonnull @Override public String name() { return "Name me!"; }
+	@Nonnull @Override public String name() { return "Random AI"; }
 
 	@Nonnull @Override public Move pickMove(
 			@Nonnull Board board,

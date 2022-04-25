@@ -56,7 +56,7 @@ public class TimeBasedMovePicker implements MovePicker{
         }
 
         //DEBUGGING
-        System.out.println("DEPTH: " + currentDepth);
+        //System.out.println("DEPTH: " + currentDepth);
 
         ArrayList<Pair<Pair<Move, Float>, Integer>> lastFullDepthMoveScoresDepths = moveScoresDepths;
         for (Pair<Pair<Move, Float>, Integer> moveScoreDepth : moveScoresDepths) {
@@ -64,10 +64,10 @@ public class TimeBasedMovePicker implements MovePicker{
             Float score = moveScoreDepth.left().right();
             Integer depth = moveScoreDepth.right();
             if (depth == currentDepth - 1){
-                System.out.println("Move: " + move + " Score: " + score);
+                //System.out.println("Move: " + move + " Score: " + score);
             }
         }
-        System.out.println("BESTMOVE: " + stableBestMove);
+        //System.ut.println("BESTMOVE: " + stableBestMove);
 
         return stableBestMove;
     }

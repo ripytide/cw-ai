@@ -10,6 +10,7 @@ import uk.ac.bris.cs.scotlandyard.model.*;
 
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
+import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Random;
 import java.util.concurrent.TimeUnit;
@@ -22,8 +23,12 @@ public class CompareAIs {
     ArrayList<Integer> availableLocations;
 
     CompareAIs() {
+        resetAvailableLocations();
+    }
+
+    private void resetAvailableLocations(){
         availableLocations = new ArrayList();
-        for (int i = 0; i < 201; i++) {
+        for (int i = 1; i <= 200; i++) {
             availableLocations.add(i);
         }
     }
@@ -32,11 +37,11 @@ public class CompareAIs {
         Random rand = new Random();
         Integer index = rand.nextInt(0, availableLocations.size());
         Integer value = availableLocations.get(index);
-        availableLocations.remove(index);
+        availableLocations.remove(value);
         return value;
     }
 
-    public ArrayList<Integer> compareTwoAis(Ai mrXAi, Ai detectivesAi, Integer numOfStartingPositions, Integer numOfRepeatGames, Long aiTimeLimit) throws IOException {
+    public ArrayList<Integer> compareTwoAis(Ai mrXAi, Ai detectivesAi, Integer numOfStartingPositions, Integer numOfRepeatGames, Integer numOfDetectives, Long aiTimeLimit) throws IOException {
         Random rand = new Random();
         Pair<Long, TimeUnit> time = new Pair<>(aiTimeLimit, TimeUnit.SECONDS);
 
@@ -55,26 +60,32 @@ public class CompareAIs {
         //10 different starting positions
         for (int i = 0; i < numOfStartingPositions; i++) {
             Player mrX = new Player(Piece.MrX.MRX, getMrXInitialTickets(), getRandomLocation());
-            ImmutableList<Player> detectives = getRandomLocationDetectives(5);
+            ImmutableList<Player> detectives = getRandomLocationDetectives(numOfDetectives);
             CustomGameState gameState = customGameStateBuilder.build(gameSetup, mrX, detectives);
 
             //to get average
-            for (int j = 0; j < numOfRepeatGames; j++) {
+            try {
+                for (int j = 0; j < numOfRepeatGames; j++) {
+                    Integer moveCount = 0;
+                    while (gameState.getWinner().isEmpty()) {
 
-                Integer moveCount = 0;
-                while (gameState.getWinner().isEmpty()) {
-
-                    Move pickedMove;
-                    if (gameState.isMrXTurn()) {
-                        pickedMove = mrXAi.pickMove(gameState, time);
-                    } else {
-                        pickedMove = detectivesAi.pickMove(gameState, time);
+                        Move pickedMove;
+                        if (gameState.isMrXTurn()) {
+                            //System.out.println("MrX moved" + Instant.now());
+                            moveCount++;
+                            pickedMove = mrXAi.pickMove(gameState, time);
+                        } else {
+                            //System.out.println("A Detective moved" + Instant.now());
+                            pickedMove = detectivesAi.pickMove(gameState, time);
+                        }
+                        gameState = gameState.advance(pickedMove);
                     }
-                    moveCount++;
-                    gameState.advance(pickedMove);
-                }
 
-                moveCounts.add(moveCount);
+                    moveCounts.add(moveCount);
+                    resetAvailableLocations();
+                }
+            }catch(Exception e){
+                System.out.print("game failed");
             }
         }
 

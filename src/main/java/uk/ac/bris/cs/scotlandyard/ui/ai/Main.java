@@ -12,11 +12,28 @@ public class Main {
 	public static void main(String[] args) throws IOException {
 		//uk.ac.bris.cs.scotlandyard.Main.main(args);
 		CompareAIs comparison = new CompareAIs();
-		Ai mrXAi = new MrXAIDistanceToNearestDetectiveMinimax();
-		Ai detectivesAi = new RandomAi();
 
-		ArrayList<Integer> result = comparison.compareTwoAis(mrXAi, detectivesAi, 1, 1, 5L);
-		System.out.println("Results: " + result);
-		System.out.println("Average: " + result.stream().reduce(0, Integer::sum));
+		ArrayList<Ai> mrXAis = new ArrayList<>();
+		mrXAis.add(new RandomAi());
+		mrXAis.add(new MrXAISimpleScoreMinimax());
+		mrXAis.add(new MrXAIDistanceToNearestDetectiveMinimax());
+		mrXAis.add(new MrXAITotalDistanceToMrXMinimax());
+
+		ArrayList<Ai> detectiveAis = new ArrayList<>();
+		detectiveAis.add(new RandomAi());
+		detectiveAis.add(new DetectiveAISimpleScoreMinimax());
+		detectiveAis.add(new DetectiveAIDistanceToNearestDetectiveMinimax());
+		detectiveAis.add(new DetectiveAITotalDistanceToMrXMinimax());
+
+		for(Ai mrXAi : mrXAis){
+			for(Ai detectiveAi : detectiveAis){
+				System.out.println("mrX Ai: " + mrXAi.name());
+				System.out.println("detective Ai: " + detectiveAi.name());
+
+				ArrayList<Integer> result = comparison.compareTwoAis(mrXAi, detectiveAi, 1, 1, 5, 1L);
+				System.out.println("Results: " + result);
+				System.out.println("Average: " + result.stream().reduce(0, Integer::sum));
+			}
+		}
 	}
 }
