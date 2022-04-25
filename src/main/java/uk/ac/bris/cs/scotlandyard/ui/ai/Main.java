@@ -14,16 +14,16 @@ public class Main {
 		CompareAIs comparison = new CompareAIs();
 
 		ArrayList<Ai> mrXAis = new ArrayList<>();
-		mrXAis.add(new RandomAi());
+		//mrXAis.add(new RandomAi());
 		mrXAis.add(new MrXAISimpleScoreMinimax());
-		mrXAis.add(new MrXAIDistanceToNearestDetectiveMinimax());
-		mrXAis.add(new MrXAITotalDistanceToMrXMinimax());
+		//mrXAis.add(new MrXAIDistanceToNearestDetectiveMinimax());
+		//mrXAis.add(new MrXAITotalDistanceToMrXMinimax());
 
 		ArrayList<Ai> detectiveAis = new ArrayList<>();
-		detectiveAis.add(new RandomAi());
+		//detectiveAis.add(new RandomAi());
 		detectiveAis.add(new DetectiveAISimpleScoreMinimax());
-		detectiveAis.add(new DetectiveAIDistanceToNearestDetectiveMinimax());
-		detectiveAis.add(new DetectiveAITotalDistanceToMrXMinimax());
+		//detectiveAis.add(new DetectiveAIDistanceToNearestDetectiveMinimax());
+		//detectiveAis.add(new DetectiveAITotalDistanceToMrXMinimax());
 
 		for(Ai mrXAi : mrXAis){
 			for(Ai detectiveAi : detectiveAis){

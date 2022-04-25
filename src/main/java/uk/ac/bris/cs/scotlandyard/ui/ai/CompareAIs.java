@@ -86,6 +86,7 @@ public class CompareAIs {
                 }
             }catch(Exception e){
                 System.out.print("game failed");
+                throw e;
             }
         }
 
