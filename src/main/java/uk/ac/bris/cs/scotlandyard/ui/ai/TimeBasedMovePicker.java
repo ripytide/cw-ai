@@ -19,6 +19,9 @@ public class TimeBasedMovePicker implements MovePicker{
     
     @Override
     public Move selectionAlgorithm(CustomGameState gameState, Board board, Pair<Long, TimeUnit> timeoutPair) {
+        if(!gameState.getWinner().isEmpty()){
+            System.out.println();
+        }
         Long currentTime = Instant.now().toEpochMilli();
         Long endTime = currentTime + timeoutPair.right().toMillis(timeoutPair.left()) - 500L;
 

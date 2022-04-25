@@ -78,7 +78,9 @@ public class CustomGameState implements Board {
         System.out.println("AVAILABLE MOVES: " + moves);
         System.out.println("CHOSEN MOVE: " + move);
 
-        if (!moves.contains(move)) throw new IllegalArgumentException("Illegal move: " + move);
+        if (!moves.contains(move)) {
+            throw new IllegalArgumentException("Illegal move: " + move);
+        }
         return advanceNoCheck(move);
     }
 

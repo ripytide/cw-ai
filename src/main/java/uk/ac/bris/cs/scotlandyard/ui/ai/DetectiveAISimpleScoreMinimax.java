@@ -20,8 +20,11 @@ public class DetectiveAISimpleScoreMinimax implements Ai {
         AccuracyBasedMetaScore minMax = new MinMax(score);
         MovePicker timeBasedMovePicker = new TimeBasedMovePicker(minMax);
 
+        //ERROR IS IN CONVERTING BOARD TO CUSTOMGAMESTATE
         CustomGameState gameState = CustomGameState.build(board, true);
-
+        if(!gameState.getWinner().isEmpty()){
+            System.out.println();
+        }
         return timeBasedMovePicker.selectionAlgorithm(gameState, board, timeoutPair);
     }
 }

@@ -76,6 +76,9 @@ public class CompareAIs {
                             pickedMove = mrXAi.pickMove(gameState, time);
                         } else {
                             //System.out.println("A Detective moved" + Instant.now());
+                            if(!gameState.getWinner().isEmpty()){
+                                System.out.println();
+                            }
                             pickedMove = detectivesAi.pickMove(gameState, time);
                         }
                         gameState = gameState.advance(pickedMove);
