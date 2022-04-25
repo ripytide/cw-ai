@@ -75,6 +75,9 @@ public class CustomGameState implements Board {
 
     @Nonnull
     public CustomGameState advance(Move move) {
+        System.out.println("AVALIBLE MOVES: " + moves);
+        System.out.println("CHOSEN MOVE: " + move);
+
         if (!moves.contains(move)) throw new IllegalArgumentException("Illegal move: " + move);
         return advanceNoCheck(move);
     }
@@ -296,10 +299,11 @@ public class CustomGameState implements Board {
     public static CustomGameState build(Board board, boolean isDetectivesTurn) {
         ImmutableSet<Piece> pieces = board.getPlayers();
         List<Piece> detectives = board.getPlayers().stream().filter(Piece::isDetective).toList();
-        List<Player> detectivePlayers = detectives.stream().map(p -> convertPieceToPlayer(p, board)).toList();
+        List<Player> detectivePlayers = detectives.stream().map(p -> convertPieceToPlayer(p, board, isDetectivesTurn)).toList();
 
         Piece mrXPiece = pieces.stream().filter(Piece::isMrX).findFirst().get();
-        Player mrXPlayer = convertPieceToPlayer(mrXPiece, board);
+
+        Player mrXPlayer = convertPieceToPlayer(mrXPiece, board, isDetectivesTurn);
 
         ImmutableSet<Piece> remaining = isDetectivesTurn ? ImmutableSet.copyOf(detectives) : ImmutableSet.of(mrXPiece);
         return new CustomGameState(board.getSetup(), remaining,
@@ -307,7 +311,7 @@ public class CustomGameState implements Board {
                 ImmutableList.copyOf(detectivePlayers));
     }
 
-    private static Player convertPieceToPlayer(Piece piece, Board board) {
+    private static Player convertPieceToPlayer(Piece piece, Board board, boolean isDetectiveTurn) {
         Integer location;
         if (piece.isMrX()) {
             location = 114;
@@ -318,6 +322,10 @@ public class CustomGameState implements Board {
             }
         } else {
             location = board.getDetectiveLocation((Piece.Detective) piece).get();
+        }
+
+        if (!isDetectiveTurn && piece.isMrX()) {
+            location = board.getAvailableMoves().iterator().next().source();
         }
         return new Player(piece, convertTicketBoardToMap(board.getPlayerTickets(piece).get()), location);
     }

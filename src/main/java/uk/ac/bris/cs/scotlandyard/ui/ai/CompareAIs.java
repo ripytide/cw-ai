@@ -54,7 +54,7 @@ public class CompareAIs {
 
         //10 different starting positions
         for (int i = 0; i < numOfStartingPositions; i++) {
-            Player mrX = new Player(Piece.MrX.MRX, getInitialTickets(), getRandomLocation());
+            Player mrX = new Player(Piece.MrX.MRX, getMrXInitialTickets(), getRandomLocation());
             ImmutableList<Player> detectives = getRandomLocationDetectives(5);
             CustomGameState gameState = customGameStateBuilder.build(gameSetup, mrX, detectives);
 
@@ -92,18 +92,26 @@ public class CompareAIs {
         colours.add(Piece.Detective.YELLOW);
 
         for (int i = 0; i < numberOfDetectives; i++) {
-            Player detective = new Player(colours.get(i), getInitialTickets(), getRandomLocation());
+            Player detective = new Player(colours.get(i), getDetectivesInitialTickets(), getRandomLocation());
             mutableDetectives.add(detective);
         }
 
         return ImmutableList.copyOf(mutableDetectives);
     }
 
-    private ImmutableMap<ScotlandYard.Ticket, Integer> getInitialTickets() {
+    private ImmutableMap<ScotlandYard.Ticket, Integer> getMrXInitialTickets() {
         return ImmutableMap.of(ScotlandYard.Ticket.TAXI, 4,
                 ScotlandYard.Ticket.BUS, 3,
                 ScotlandYard.Ticket.UNDERGROUND, 3,
                 ScotlandYard.Ticket.DOUBLE, 2,
                 ScotlandYard.Ticket.SECRET, 5);
+    }
+
+    private ImmutableMap<ScotlandYard.Ticket, Integer> getDetectivesInitialTickets() {
+             return ImmutableMap.of(ScotlandYard.Ticket.TAXI, 8,
+                     ScotlandYard.Ticket.BUS, 8,
+                     ScotlandYard.Ticket.UNDERGROUND, 8,
+                     ScotlandYard.Ticket.DOUBLE, 0,
+                     ScotlandYard.Ticket.SECRET, 0);
     }
 }

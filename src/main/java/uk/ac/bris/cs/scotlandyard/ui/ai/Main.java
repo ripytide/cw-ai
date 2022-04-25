@@ -15,7 +15,7 @@ public class Main {
 		Ai mrXAi = new MrXAIDistanceToNearestDetectiveMinimax();
 		Ai detectivesAi = new RandomAi();
 
-		ArrayList<Integer> result = comparison.compareTwoAis(mrXAi, detectivesAi, 10, 3, 10L);
+		ArrayList<Integer> result = comparison.compareTwoAis(mrXAi, detectivesAi, 1, 1, 5L);
 		System.out.println("Results: " + result);
 		System.out.println("Average: " + result.stream().reduce(0, Integer::sum));
 	}
