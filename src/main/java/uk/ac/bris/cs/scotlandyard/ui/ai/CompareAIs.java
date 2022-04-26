@@ -19,6 +19,11 @@ import java.util.stream.IntStream;
 import static uk.ac.bris.cs.scotlandyard.model.ScotlandYard.REVEAL_MOVES;
 import static uk.ac.bris.cs.scotlandyard.model.ScotlandYard.readGraph;
 
+enum WhoWon {
+Detectives,
+MrX,
+}
+
 public class CompareAIs {
     ArrayList<Integer> availableLocations;
 
@@ -28,7 +33,7 @@ public class CompareAIs {
 
     private void resetAvailableLocations(){
         availableLocations = new ArrayList();
-        for (int i = 1; i <= 200; i++) {
+        for (int i = 1; i <= 199; i++) {
             availableLocations.add(i);
         }
     }
@@ -41,7 +46,7 @@ public class CompareAIs {
         return value;
     }
 
-    public ArrayList<Integer> compareTwoAis(Ai mrXAi, Ai detectivesAi, Integer numOfStartingPositions, Integer numOfRepeatGames, Integer numOfDetectives, Long aiTimeLimit) throws IOException {
+    public ArrayList<Pair<Integer, WhoWon>> compareTwoAis(Ai mrXAi, Ai detectivesAi, Integer numOfStartingPositions, Integer numOfRepeatGames, Integer numOfDetectives, Long aiTimeLimit) throws IOException {
         Random rand = new Random();
         Pair<Long, TimeUnit> time = new Pair<>(aiTimeLimit, TimeUnit.SECONDS);
 
@@ -55,7 +60,7 @@ public class CompareAIs {
                 .collect(ImmutableList.toImmutableList()));
 
 
-        ArrayList<Integer> moveCounts = new ArrayList<>();
+        ArrayList<Pair<Integer, WhoWon>> gamesResults = new ArrayList<>();
 
         //10 different starting positions
         for (int i = 0; i < numOfStartingPositions; i++) {
@@ -81,7 +86,15 @@ public class CompareAIs {
                         gameState = gameState.advance(pickedMove);
                     }
 
-                    moveCounts.add(moveCount);
+                    //keeping track of both who won and the move count
+                    WhoWon whoWon;
+                    if(gameState.getWinner().contains(Piece.MrX.MRX)){
+                        whoWon = WhoWon.MrX;
+                    }else{
+                        whoWon = WhoWon.Detectives;
+                    }
+                    gamesResults.add(new Pair<>(moveCount, whoWon));
+
                     resetAvailableLocations();
                 }
             }catch(Exception e){
@@ -90,7 +103,7 @@ public class CompareAIs {
             }
         }
 
-        return moveCounts;
+        return gamesResults;
     }
 
     private ImmutableList<Player> getRandomLocationDetectives(Integer numberOfDetectives) {

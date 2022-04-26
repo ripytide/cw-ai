@@ -1,5 +1,6 @@
 package uk.ac.bris.cs.scotlandyard.ui.ai;
 
+import io.atlassian.fugue.Pair;
 import uk.ac.bris.cs.scotlandyard.model.Ai;
 
 import java.io.IOException;
@@ -30,9 +31,14 @@ public class Main {
 				System.out.println("mrX Ai: " + mrXAi.name());
 				System.out.println("detective Ai: " + detectiveAi.name());
 
-				ArrayList<Integer> result = comparison.compareTwoAis(mrXAi, detectiveAi, 1, 1, 5, 1L);
+				ArrayList<Pair<Integer, WhoWon>> result = comparison.compareTwoAis(mrXAi, detectiveAi, 1, 1, 1, 1L);
 				System.out.println("Results: " + result);
-				System.out.println("Average: " + result.stream().reduce(0, Integer::sum));
+
+				System.out.println("Average: " + result.stream().map(p -> p.left()).reduce(0, Integer::sum));
+
+				System.out.println("MrX Won: " + result.stream().map(p -> p.right()).filter(w -> w==WhoWon.MrX).count() + " times");
+				System.out.println("Detectives Won: " + result.stream().map(p -> p.right()).filter(w -> w==WhoWon.Detectives).count() + " times");
+				System.out.println();
 			}
 		}
 	}
