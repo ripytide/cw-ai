@@ -59,7 +59,7 @@ public class CompareAIs {
 
         //10 different starting positions
         for (int i = 0; i < numOfStartingPositions; i++) {
-            Player mrX = new Player(Piece.MrX.MRX, getMrXInitialTickets(), getRandomLocation());
+            Player mrX = new Player(Piece.MrX.MRX, getMrXInitialTickets(numOfDetectives), getRandomLocation());
             ImmutableList<Player> detectives = getRandomLocationDetectives(numOfDetectives);
             CustomGameState gameState = customGameStateBuilder.build(gameSetup, mrX, detectives);
 
@@ -76,9 +76,6 @@ public class CompareAIs {
                             pickedMove = mrXAi.pickMove(gameState, time);
                         } else {
                             //System.out.println("A Detective moved" + Instant.now());
-                            if(!gameState.getWinner().isEmpty()){
-                                System.out.println();
-                            }
                             pickedMove = detectivesAi.pickMove(gameState, time);
                         }
                         gameState = gameState.advance(pickedMove);
@@ -114,18 +111,18 @@ public class CompareAIs {
         return ImmutableList.copyOf(mutableDetectives);
     }
 
-    private ImmutableMap<ScotlandYard.Ticket, Integer> getMrXInitialTickets() {
+    private ImmutableMap<ScotlandYard.Ticket, Integer> getMrXInitialTickets(int numOfDetectives) {
         return ImmutableMap.of(ScotlandYard.Ticket.TAXI, 4,
                 ScotlandYard.Ticket.BUS, 3,
                 ScotlandYard.Ticket.UNDERGROUND, 3,
                 ScotlandYard.Ticket.DOUBLE, 2,
-                ScotlandYard.Ticket.SECRET, 5);
+                ScotlandYard.Ticket.SECRET, numOfDetectives);
     }
 
     private ImmutableMap<ScotlandYard.Ticket, Integer> getDetectivesInitialTickets() {
-             return ImmutableMap.of(ScotlandYard.Ticket.TAXI, 8,
+             return ImmutableMap.of(ScotlandYard.Ticket.TAXI, 10,
                      ScotlandYard.Ticket.BUS, 8,
-                     ScotlandYard.Ticket.UNDERGROUND, 8,
+                     ScotlandYard.Ticket.UNDERGROUND, 4,
                      ScotlandYard.Ticket.DOUBLE, 0,
                      ScotlandYard.Ticket.SECRET, 0);
     }

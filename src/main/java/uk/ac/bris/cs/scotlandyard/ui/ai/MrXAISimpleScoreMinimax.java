@@ -23,9 +23,7 @@ public class MrXAISimpleScoreMinimax implements Ai {
         MovePicker timeBasedMovePicker = new TimeBasedMovePicker(minMax);
 
         CustomGameState gameState = CustomGameState.build(board, false);
-        if(!gameState.getWinner().isEmpty()){
-            System.out.println();
-        }
+        
         return timeBasedMovePicker.selectionAlgorithm(gameState, board, timeoutPair);
     }
 }

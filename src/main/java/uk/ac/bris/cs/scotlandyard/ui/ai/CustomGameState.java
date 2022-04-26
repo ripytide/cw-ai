@@ -75,8 +75,8 @@ public class CustomGameState implements Board {
 
     @Nonnull
     public CustomGameState advance(Move move) {
-        System.out.println("AVAILABLE MOVES: " + moves);
-        System.out.println("CHOSEN MOVE: " + move);
+        //System.out.println("AVAILABLE MOVES: " + moves);
+        //System.out.println("CHOSEN MOVE: " + move);
 
         if (!moves.contains(move)) {
             throw new IllegalArgumentException("Illegal move: " + move);
@@ -301,11 +301,11 @@ public class CustomGameState implements Board {
     public static CustomGameState build(Board board, boolean isDetectivesTurn) {
         ImmutableSet<Piece> pieces = board.getPlayers();
         List<Piece> detectives = board.getPlayers().stream().filter(Piece::isDetective).toList();
-        List<Player> detectivePlayers = detectives.stream().map(p -> convertPieceToPlayer(p, board, isDetectivesTurn)).toList();
+        List<Player> detectivePlayers = detectives.stream().map(p -> convertDetectivePieceToPlayer((Piece.Detective) p, board)).toList();
 
         Piece mrXPiece = pieces.stream().filter(Piece::isMrX).findFirst().get();
 
-        Player mrXPlayer = convertPieceToPlayer(mrXPiece, board, isDetectivesTurn);
+        Player mrXPlayer = convertMrXPieceToPlayer(mrXPiece, board, isDetectivesTurn, detectivePlayers.stream().map(p -> p.location()).toList());
 
         ImmutableSet<Piece> remaining = isDetectivesTurn ? ImmutableSet.copyOf(detectives) : ImmutableSet.of(mrXPiece);
         return new CustomGameState(board.getSetup(), remaining,
@@ -313,23 +313,42 @@ public class CustomGameState implements Board {
                 ImmutableList.copyOf(detectivePlayers));
     }
 
-    private static Player convertPieceToPlayer(Piece piece, Board board, boolean isDetectiveTurn) {
-        Integer location;
-        if (piece.isMrX()) {
-            location = 114;
-            for (LogEntry l : board.getMrXTravelLog()){
-                if (l.location().isPresent()) {
-                    location = l.location().get();
-                }
-            }
-        } else {
-            location = board.getDetectiveLocation((Piece.Detective) piece).get();
-        }
+    private static Player convertDetectivePieceToPlayer(Piece.Detective piece, Board board) {
+        return new Player(piece, convertTicketBoardToMap(board.getPlayerTickets(piece).get()), board.getDetectiveLocation(piece).get());
+    }
 
-        if (!isDetectiveTurn && piece.isMrX()) {
+    private static Player convertMrXPieceToPlayer(Piece piece, Board board, boolean isDetectiveTurn, List<Integer> detectiveLocations) {
+        Integer location;
+        if (!isDetectiveTurn) {
             location = board.getAvailableMoves().iterator().next().source();
+        } else {
+            location = getMrXAssumptionLocation(board, detectiveLocations);
         }
         return new Player(piece, convertTicketBoardToMap(board.getPlayerTickets(piece).get()), location);
+    }
+
+    private static Integer getMrXAssumptionLocation(Board board, List<Integer> detectiveLocations) {
+        int location = 114;
+        for (LogEntry l : board.getMrXTravelLog()) {
+            if (l.location().isPresent()) {
+                location = l.location().get();
+            }
+        }
+
+        //If MrX location hidden, get closed unoccupied location to where he was last seen
+        int deviateBy = 1;
+        boolean goingUp = true;
+        while (detectiveLocations.contains(location)) {
+            if (goingUp) {
+                location += deviateBy;
+            } else {
+                location -= deviateBy;
+            }
+            deviateBy++;
+            goingUp = !(goingUp);
+        }
+        
+        return location;
     }
 
     private static ImmutableMap<ScotlandYard.Ticket, Integer> convertTicketBoardToMap(Board.TicketBoard ticketBoard) {
