@@ -21,7 +21,11 @@ public class CustomGameState implements Board {
     private final ImmutableSet<Piece> winner;
 
 
-    public CustomGameState(@Nonnull final GameSetup setup, @Nonnull final ImmutableSet<Piece> remaining, @Nonnull final ImmutableList<LogEntry> log, @Nonnull final Player mrX, @Nonnull final ImmutableList<Player> detectives) {
+    public CustomGameState(@Nonnull final GameSetup setup,
+                           @Nonnull final ImmutableSet<Piece> remaining,
+                           @Nonnull final ImmutableList<LogEntry> log,
+                           @Nonnull final Player mrX,
+                           @Nonnull final ImmutableList<Player> detectives) {
         this.setup = setup;
         this.remaining = remaining;
         this.log = log;
@@ -67,17 +71,16 @@ public class CustomGameState implements Board {
         return winner;
     }
 
+    //includes check for winners
     @Nonnull
     public ImmutableSet<Move> getAvailableMoves() {
         if (!winner.isEmpty()) return ImmutableSet.of();
         return getMoves();
     }
 
+    //includes check for illegal moves
     @Nonnull
     public CustomGameState advance(Move move) {
-        //System.out.println("AVAILABLE MOVES: " + moves);
-        //System.out.println("CHOSEN MOVE: " + move);
-
         if (!moves.contains(move)) {
             throw new IllegalArgumentException("Illegal move: " + move);
         }
@@ -92,7 +95,8 @@ public class CustomGameState implements Board {
         return !isDetectivesTurn();
     }
 
-    private static void removeUsedTickets(HashMap<ScotlandYard.Ticket, Integer> tickets, Iterable<ScotlandYard.Ticket> usedTickets) {
+    private static void removeUsedTickets(HashMap<ScotlandYard.Ticket, Integer> tickets, 
+                                          Iterable<ScotlandYard.Ticket> usedTickets) {
         usedTickets.forEach(t -> tickets.compute(t, (key, oldTicketCount) -> oldTicketCount - 1));
     }
 
@@ -105,7 +109,9 @@ public class CustomGameState implements Board {
         return detectives.stream().map(Player::location).toList().contains(location);
     }
 
-    private static void giveUsedTicket(HashMap<ScotlandYard.Ticket, Integer> tickets, Iterable<ScotlandYard.Ticket> usedTickets) {
+    private static void giveUsedTicket(HashMap<ScotlandYard.Ticket, 
+                                       Integer> tickets, 
+                                       Iterable<ScotlandYard.Ticket> usedTickets) {
         usedTickets.forEach(t -> tickets.compute(t, (key, oldTicketCount) -> oldTicketCount + 1));
     }
 
@@ -118,7 +124,9 @@ public class CustomGameState implements Board {
 
         boolean mrXWins = (isMrXTurn() && logIsFull) || (isDetectivesTurn() && (noAvailableMoves));
 
-        boolean detectivesWin = (isMrXTurn() && noAvailableMoves && !logIsFull) || mrXCaught || isDetectiveOccupied(mrX.location());
+        boolean detectivesWin = (isMrXTurn() && noAvailableMoves && !logIsFull) || 
+                                 mrXCaught || 
+                                 isDetectiveOccupied(mrX.location());
 
         if (mrXWins) {
             return ImmutableSet.of(mrX.piece());
@@ -153,26 +161,37 @@ public class CustomGameState implements Board {
         return ImmutableSet.copyOf(availableMoves);
     }
 
-    private HashSet<Move.SingleMove> getSingleMoves(Player player, int source, Map<ScotlandYard.Ticket, Integer> availableTickets) {
+    private HashSet<Move.SingleMove> getSingleMoves(Player player,
+                                                    int source,
+                                                    Map<ScotlandYard.Ticket, Integer> availableTickets) {
         HashSet<Move.SingleMove> availableMoves = new HashSet<>();
 
         for (int destination : setup.graph.adjacentNodes(source)) {
             if (!isDetectiveOccupied(destination)) {
-                Set<ScotlandYard.Transport> availableTransport = setup.graph.edgeValueOrDefault(source, destination, ImmutableSet.of());
+                Set<ScotlandYard.Transport> availableTransport = setup.graph.edgeValueOrDefault(source, 
+                                                                                                destination, 
+                                                                                                ImmutableSet.of());
 
                 //adds all available transport moves with correct tickets
                 for (ScotlandYard.Transport t : availableTransport) {
                     boolean hasCorrectTicket = availableTickets.get(t.requiredTicket()) >= 1;
                     if (hasCorrectTicket) {
-                        availableMoves.add(new Move.SingleMove(player.piece(), source, t.requiredTicket(), destination));
+                        availableMoves.add(new Move.SingleMove(player.piece(), 
+                                           source, 
+                                           t.requiredTicket(), 
+                                           destination));
                     }
                 }
 
                 //adds secret ticket moves without counting Ferries twice
                 boolean hasSecretTicket = availableTickets.get(ScotlandYard.Ticket.SECRET) >= 1;
-                boolean hasNonFerryTransport = !availableTransport.contains(ScotlandYard.Transport.FERRY) && !availableTransport.isEmpty();
+                boolean hasNonFerryTransport = !availableTransport.contains(ScotlandYard.Transport.FERRY) && 
+                                               !availableTransport.isEmpty();
                 if (hasSecretTicket && hasNonFerryTransport) {
-                    availableMoves.add(new Move.SingleMove(player.piece(), source, ScotlandYard.Ticket.SECRET, destination));
+                    availableMoves.add(new Move.SingleMove(player.piece(), 
+                                                           source, 
+                                                           ScotlandYard.Ticket.SECRET, 
+                                                           destination));
                 }
             }
         }
@@ -189,8 +208,13 @@ public class CustomGameState implements Board {
             removeUsedTickets(availableTickets, List.of(move1.ticket));
 
             Set<Move.SingleMove> availableSecondMoves = getSingleMoves(player, destination1, availableTickets);
-            doubleMoves.addAll(availableSecondMoves.stream().map(move2 -> new Move.DoubleMove(mrX.piece(), move1.source(), move1.ticket, destination1, move2.ticket, move2.destination)).toList());
-
+            doubleMoves.addAll(availableSecondMoves.stream()
+                    .map(move2 -> new Move.DoubleMove(mrX.piece(), 
+                            move1.source(), 
+                            move1.ticket, 
+                            destination1, 
+                            move2.ticket, 
+                            move2.destination)).toList());
         }
 
         return doubleMoves;
@@ -226,16 +250,30 @@ public class CustomGameState implements Board {
 
         //update pieces
         newDetectives.remove(detective);
-        newDetectives.add(new Player(currentPiece, ImmutableMap.copyOf(newDetectiveTickets), move.accept(getEndLocationVisitor)));
+        newDetectives.add(new Player(currentPiece,
+            ImmutableMap.copyOf(newDetectiveTickets),
+            move.accept(getEndLocationVisitor))
+        );
+        
         newMrX = new Player(mrX.piece(), ImmutableMap.copyOf(newMrXTickets), mrX.location());
 
         //check if it should skip rest of detectives if they have no moves
-        CustomGameState partiallyAdvancedState = new CustomGameState(setup, ImmutableSet.copyOf(newRemaining), ImmutableList.copyOf(log), newMrX, ImmutableList.copyOf(newDetectives));
-        if (partiallyAdvancedState.getMoves().isEmpty() && !newRemaining.isEmpty() && partiallyAdvancedState.isDetectivesTurn()) {
+        CustomGameState partiallyAdvancedState = new CustomGameState(setup,
+            ImmutableSet.copyOf(newRemaining),
+            ImmutableList.copyOf(log),
+            newMrX, ImmutableList.copyOf(newDetectives)
+        );
+        
+        if (partiallyAdvancedState.getMoves().isEmpty() &&
+        !newRemaining.isEmpty() &&
+        partiallyAdvancedState.isDetectivesTurn()) {
             newRemaining = new ArrayList<>(List.of(mrX.piece()));
         }
 
-        return new CustomGameState(setup, ImmutableSet.copyOf(newRemaining), ImmutableList.copyOf(log), newMrX, ImmutableList.copyOf(newDetectives));
+        return new CustomGameState(setup,
+        ImmutableSet.copyOf(newRemaining),
+        ImmutableList.copyOf(log),
+        newMrX, ImmutableList.copyOf(newDetectives));
     }
 
     private CustomGameState advanceMrX(Move move) {
@@ -254,9 +292,15 @@ public class CustomGameState implements Board {
         newLog.addAll(move.accept(getAdditionalLogEntriesVisitorCreator(moveNumber)));
 
         removeUsedTickets(newMrXTickets, move.tickets());
-        Player newMrX = new Player(mrX.piece(), ImmutableMap.copyOf(newMrXTickets), move.accept(new GetEndLocationVisitor()));
+        Player newMrX = new Player(mrX.piece(), 
+                ImmutableMap.copyOf(newMrXTickets), 
+                move.accept(new GetEndLocationVisitor()));
 
-        return new CustomGameState(setup, ImmutableSet.copyOf(newRemaining), ImmutableList.copyOf(newLog), newMrX, detectives);
+        return new CustomGameState(setup, 
+                ImmutableSet.copyOf(newRemaining), 
+                ImmutableList.copyOf(newLog), 
+                newMrX, 
+                detectives);
     }
 
     //used in appending log entries
@@ -301,11 +345,16 @@ public class CustomGameState implements Board {
     public static CustomGameState build(Board board, boolean isDetectivesTurn) {
         ImmutableSet<Piece> pieces = board.getPlayers();
         List<Piece> detectives = board.getPlayers().stream().filter(Piece::isDetective).toList();
-        List<Player> detectivePlayers = detectives.stream().map(p -> convertDetectivePieceToPlayer((Piece.Detective) p, board)).toList();
+        List<Player> detectivePlayers = detectives.stream().map(
+            p -> convertDetectivePieceToPlayer((Piece.Detective) p, board)
+        ).toList();
 
         Piece mrXPiece = pieces.stream().filter(Piece::isMrX).findFirst().get();
 
-        Player mrXPlayer = convertMrXPieceToPlayer(mrXPiece, board, isDetectivesTurn, detectivePlayers.stream().map(p -> p.location()).toList());
+        Player mrXPlayer = convertMrXPieceToPlayer(mrXPiece, 
+                board, 
+                isDetectivesTurn, 
+                detectivePlayers.stream().map(Player::location).toList());
 
         ImmutableSet<Piece> remaining = isDetectivesTurn ? ImmutableSet.copyOf(detectives) : ImmutableSet.of(mrXPiece);
         return new CustomGameState(board.getSetup(), remaining,
@@ -314,7 +363,10 @@ public class CustomGameState implements Board {
     }
 
     private static Player convertDetectivePieceToPlayer(Piece.Detective piece, Board board) {
-        return new Player(piece, convertTicketBoardToMap(board.getPlayerTickets(piece).get()), board.getDetectiveLocation(piece).get());
+        return new Player(piece,
+            convertTicketBoardToMap(board.getPlayerTickets(piece).get()),
+            board.getDetectiveLocation(piece).get()
+        );
     }
 
     private static Player convertMrXPieceToPlayer(Piece piece, Board board, boolean isDetectiveTurn, List<Integer> detectiveLocations) {
@@ -347,7 +399,7 @@ public class CustomGameState implements Board {
             deviateBy++;
             goingUp = !(goingUp);
         }
-        
+
         return location;
     }
 
@@ -378,7 +430,7 @@ public class CustomGameState implements Board {
 
     public List<Float> getDistancesBetweenMrXAndDetectives() {
         Integer mrXLocation = mrX.location();
-        List<Integer> detectiveLocations = detectives.stream().map(d -> d.location()).toList();
+        List<Integer> detectiveLocations = detectives.stream().map(Player::location).toList();
         return detectiveLocations.stream()
                 .map(d -> distanceBetweenLocations(d, mrXLocation))
                 .toList();

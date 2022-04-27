@@ -4,9 +4,8 @@ import io.atlassian.fugue.Pair;
 import uk.ac.bris.cs.scotlandyard.model.Board;
 import uk.ac.bris.cs.scotlandyard.model.Move;
 
-import javax.annotation.Nonnull;
 import java.util.concurrent.TimeUnit;
 
 public interface MovePicker {
-    public Move selectionAlgorithm(CustomGameState gameState, Board board, Pair<Long, TimeUnit> timeoutPair);
+    Move selectionAlgorithm(CustomGameState gameState, Board board, Pair<Long, TimeUnit> timeoutPair);
 }

@@ -1,10 +1,7 @@
 package uk.ac.bris.cs.scotlandyard.ui.ai;
 
 import com.google.common.collect.ImmutableSet;
-import uk.ac.bris.cs.scotlandyard.model.Board;
 import uk.ac.bris.cs.scotlandyard.model.Piece;
-
-import java.util.stream.Collectors;
 
 public class SimpleScore implements Score{
     @Override

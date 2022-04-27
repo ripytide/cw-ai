@@ -10,7 +10,6 @@ import uk.ac.bris.cs.scotlandyard.model.*;
 
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
-import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Random;
 import java.util.concurrent.TimeUnit;
@@ -20,8 +19,8 @@ import static uk.ac.bris.cs.scotlandyard.model.ScotlandYard.REVEAL_MOVES;
 import static uk.ac.bris.cs.scotlandyard.model.ScotlandYard.readGraph;
 
 enum WhoWon {
-Detectives,
-MrX,
+    Detectives,
+    MrX,
 }
 
 public class CompareAIs {
@@ -31,8 +30,8 @@ public class CompareAIs {
         resetAvailableLocations();
     }
 
-    private void resetAvailableLocations(){
-        availableLocations = new ArrayList();
+    private void resetAvailableLocations() {
+        availableLocations = new ArrayList<>();
         for (int i = 1; i <= 199; i++) {
             availableLocations.add(i);
         }
@@ -43,44 +42,52 @@ public class CompareAIs {
         Integer index = rand.nextInt(0, availableLocations.size());
         Integer value = availableLocations.get(index);
         availableLocations.remove(value);
+
         return value;
     }
 
-    public ArrayList<Pair<Integer, WhoWon>> compareTwoAis(Ai mrXAi, Ai detectivesAi, Integer numOfStartingPositions, Integer numOfRepeatGames, Integer numOfDetectives, Long aiTimeLimit) throws IOException {
-        Random rand = new Random();
+    //returns the move count and who won for every game played between two AIs
+    public ArrayList<Pair<Integer, WhoWon>> compareTwoAis(Ai mrXAi,
+                                                          Ai detectivesAi,
+                                                          Integer numOfStartingPositions,
+                                                          Integer numOfRepeatGames,
+                                                          Integer numOfDetectives,
+                                                          Long aiTimeLimit) throws IOException {
         Pair<Long, TimeUnit> time = new Pair<>(aiTimeLimit, TimeUnit.SECONDS);
 
         CustomGameStateBuilder customGameStateBuilder = new CustomGameStateBuilder();
 
-        ImmutableValueGraph<Integer, ImmutableSet<ScotlandYard.Transport>> standardGraph = readGraph(Resources.toString(
-                Resources.getResource("graph.txt"), StandardCharsets.UTF_8));
+        //reads graph (with nodes from 1-199) from Resources - Taken from GameSetup (Closed Task)
+        ImmutableValueGraph<Integer, ImmutableSet<ScotlandYard.Transport>> standardGraph = readGraph(Resources
+                .toString(Resources
+                        .getResource("graph.txt"),
+                                     StandardCharsets.UTF_8));
 
+        //makes a GameStu using standard hidden moves
         GameSetup gameSetup = new GameSetup(standardGraph, IntStream.rangeClosed(1, 24)
                 .mapToObj(REVEAL_MOVES::contains)
                 .collect(ImmutableList.toImmutableList()));
 
-
         ArrayList<Pair<Integer, WhoWon>> gamesResults = new ArrayList<>();
 
-        //10 different starting positions
+        //controls for luck of starting positions
         for (int i = 0; i < numOfStartingPositions; i++) {
             Player mrX = new Player(Piece.MrX.MRX, getMrXInitialTickets(numOfDetectives), getRandomLocation());
             ImmutableList<Player> detectives = getRandomLocationDetectives(numOfDetectives);
             CustomGameState gameState = customGameStateBuilder.build(gameSetup, mrX, detectives);
 
-            //to get average
+            //containerizing possibly error-prone code
             try {
+                //repeat games increases repeatability of results
                 for (int j = 0; j < numOfRepeatGames; j++) {
                     Integer moveCount = 0;
                     while (gameState.getWinner().isEmpty()) {
 
                         Move pickedMove;
                         if (gameState.isMrXTurn()) {
-                            //System.out.println("MrX moved" + Instant.now());
                             moveCount++;
                             pickedMove = mrXAi.pickMove(gameState, time);
                         } else {
-                            //System.out.println("A Detective moved" + Instant.now());
                             pickedMove = detectivesAi.pickMove(gameState, time);
                         }
                         gameState = gameState.advance(pickedMove);
@@ -88,24 +95,24 @@ public class CompareAIs {
 
                     //keeping track of both who won and the move count
                     WhoWon whoWon;
-                    if(gameState.getWinner().contains(Piece.MrX.MRX)){
+                    if (gameState.getWinner().contains(Piece.MrX.MRX)) {
                         whoWon = WhoWon.MrX;
-                    }else{
+                    } else {
                         whoWon = WhoWon.Detectives;
                     }
                     gamesResults.add(new Pair<>(moveCount, whoWon));
 
                     resetAvailableLocations();
                 }
-            }catch(Exception e){
+            } catch (Exception e) {
                 System.out.print("game failed");
                 throw e;
             }
         }
-
         return gamesResults;
     }
 
+    //returns detectives in random and available locations
     private ImmutableList<Player> getRandomLocationDetectives(Integer numberOfDetectives) {
         ArrayList<Player> mutableDetectives = new ArrayList<>();
 
@@ -124,6 +131,7 @@ public class CompareAIs {
         return ImmutableList.copyOf(mutableDetectives);
     }
 
+    //standard tickets for MrX
     private ImmutableMap<ScotlandYard.Ticket, Integer> getMrXInitialTickets(int numOfDetectives) {
         return ImmutableMap.of(ScotlandYard.Ticket.TAXI, 4,
                 ScotlandYard.Ticket.BUS, 3,
@@ -132,11 +140,12 @@ public class CompareAIs {
                 ScotlandYard.Ticket.SECRET, numOfDetectives);
     }
 
+    //standard tickets for detectives
     private ImmutableMap<ScotlandYard.Ticket, Integer> getDetectivesInitialTickets() {
-             return ImmutableMap.of(ScotlandYard.Ticket.TAXI, 10,
-                     ScotlandYard.Ticket.BUS, 8,
-                     ScotlandYard.Ticket.UNDERGROUND, 4,
-                     ScotlandYard.Ticket.DOUBLE, 0,
-                     ScotlandYard.Ticket.SECRET, 0);
+        return ImmutableMap.of(ScotlandYard.Ticket.TAXI, 10,
+                ScotlandYard.Ticket.BUS, 8,
+                ScotlandYard.Ticket.UNDERGROUND, 4,
+                ScotlandYard.Ticket.DOUBLE, 0,
+                ScotlandYard.Ticket.SECRET, 0);
     }
 }
